@@ -13,7 +13,7 @@ public class LineAPI {
 
 		String postAssetUrlStringUrl = "/api/v1/lines";
 		try {
-			Api.loadProperties();
+		//	Api.loadProperties();
 			String ApiResponse = Api.postAPICallNew(postAssetUrlStringUrl, payload);
 			if (!ApiResponse.isEmpty()) {
 				ObjectMapper mapper = new ObjectMapper();

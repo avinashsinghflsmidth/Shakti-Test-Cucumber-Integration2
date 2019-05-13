@@ -16,7 +16,6 @@ public class EquipmentAPI {
 	public EquipmentResponse postEquipment(String payload) {
 		String postEquipmentUrlString = "/api/v1/equipments";
 		try {
-			Api.loadProperties();
 			String ApiResponse = Api.postAPICallNew(postEquipmentUrlString, payload);
 			if (!ApiResponse.isEmpty()) {
 				ObjectMapper mapper = new ObjectMapper();

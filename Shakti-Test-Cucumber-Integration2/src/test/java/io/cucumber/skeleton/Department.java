@@ -1,6 +1,5 @@
 package io.cucumber.skeleton;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,9 +56,9 @@ public class Department {
 	public void postData() {
 		ObjectMapper mapperObj = new ObjectMapper();
 		String departmentData = "";
-		 Date date= new Date();
+		long time = System.currentTimeMillis();
 		try {
-			dataTableHashMap.put("name", date.getTime()+"_name");
+			dataTableHashMap.put("name", dataTableHashMap.get("name")+time);
 			departmentData = mapperObj.writeValueAsString(dataTableHashMap);
 			System.out.println("departmentData :::"+departmentData);
 		} catch (JsonProcessingException e) {
@@ -117,7 +116,7 @@ public class Department {
 					if(getAllAfterPostResponse!=null && getAllAfterPostResponse.getValues().size()>0) {
 						DepartmentResponse departmentResponse = getAllAfterPostResponse.getValues().stream().filter(dept -> dept.getId().equals(departmentPostResponse.getId())).findAny().orElse(null);
 						if(departmentResponse != null) {
-							System.out.println("dept id is present in first page getAllAfterPostResponse");
+							System.out.println("id is present in first page");
 						}else {
 							// If id not present then..
 

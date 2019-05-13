@@ -18,7 +18,6 @@ public class DepartmentAPI {
 	public DepartmentResponse postDepartment(String requestData) {
 		String postApiUrlString = "/api/v1/departments";
 		try {
-			Api.loadProperties();
 			String ApiResponse = Api.postAPICallNew(postApiUrlString, requestData);
 			DepartmentResponse response = null;
 			if (!ApiResponse.isEmpty()) {

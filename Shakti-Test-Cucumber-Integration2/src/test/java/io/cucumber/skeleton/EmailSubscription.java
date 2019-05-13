@@ -1,9 +1,10 @@
 package io.cucumber.skeleton;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.junit.Assert;
 
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
@@ -12,6 +13,7 @@ import io.cucumber.api.EmailSubscriptionAPI;
 import io.cucumber.datatable.DataTable;
 import io.cucumber.datatable.dependency.com.fasterxml.jackson.core.JsonProcessingException;
 import io.cucumber.datatable.dependency.com.fasterxml.jackson.databind.ObjectMapper;
+import io.cucumber.model.EmailSubscriptionGetResponse;
 import io.cucumber.model.EmailSubscriptionResponse;
 
 /*
@@ -19,8 +21,15 @@ import io.cucumber.model.EmailSubscriptionResponse;
  */
 public class EmailSubscription {
 	List<Map<String, String>> list;
-	EmailSubscriptionResponse postResponse;
+	EmailSubscriptionResponse emailPostResponse;
 	HashMap<String, String> dataTableHashMap;
+	EmailSubscriptionGetResponse getAllAfterPostResponse;
+	EmailSubscriptionGetResponse getAllAfterDeleteResp;
+	
+	private int totalRecordAfterPost;
+	private int totalRecordAfterDelete;
+
+
 
 	@Given("^I have below Details for EmailSubscription$")
 	public void givenData(DataTable dataTable) {
@@ -31,7 +40,7 @@ public class EmailSubscription {
 		}
 		System.out.println("dataTableHashMap===>"+dataTableHashMap);
 	}
-	
+
 	@When("I post getAll delete getAll EmailSubscription")
 	public void postEmail() {
 		ObjectMapper mapperObj = new ObjectMapper();
@@ -43,16 +52,46 @@ public class EmailSubscription {
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 		}
-		
 		EmailSubscriptionAPI emailApi = new EmailSubscriptionAPI();
-		postResponse = emailApi.postEmail(emailData);
-		
-		System.out.println("email postResponse ::"+postResponse);
+
+		emailPostResponse = emailApi.postEmail(emailData);
+
+		getAllAfterPostResponse = emailApi.getAllEmail();
+		totalRecordAfterPost = getAllAfterPostResponse.getTotalCount();
+
+		emailApi.deleteEmail(emailPostResponse.getEventEmailSubscriptionId());
+
+		getAllAfterDeleteResp = emailApi.getAllEmail();
+		totalRecordAfterDelete = getAllAfterDeleteResp.getTotalCount();
 	}	
 
 	@Then("validate the EmailSubscription results")
 	public void validateResults() {
+		if(emailPostResponse !=null && emailPostResponse.getId() !=null && !emailPostResponse.getId().isEmpty()) {
+			if(getAllAfterPostResponse !=null && getAllAfterPostResponse.getSubscriptions().size()>0) {
+				EmailSubscriptionResponse emailSubscriptionResponse = getAllAfterPostResponse.getSubscriptions().stream().filter(a -> a.getId().equals(emailPostResponse.getId())).findAny().orElse(null);
+				if(emailSubscriptionResponse != null) {
+					System.out.println("id found in first page");
+				}else {
+					//What if not found in first page, Do we have to retrieve all pages???
+					//throw new AssertionError("Id not present in  get all response");
+				}
+			}else {
+				throw new AssertionError("Id not present in  get all response");
+			}
+		}else {
+			throw new AssertionError("Id was not found in posted response");
+		}
+
+		//Check equipments details after  DELETE
+		EmailSubscriptionResponse emailSubscriptionResponse = getAllAfterDeleteResp.getSubscriptions().stream().filter(a -> a.getId().equals(emailPostResponse.getId())).findAny().orElse(null);
+		if(emailSubscriptionResponse != null) {
+			throw new AssertionError("Id is present in  get all response after delete");
+		}else {
+			System.out.println("subscription deleted");
+		}
 		
+		Assert.assertEquals(totalRecordAfterPost-1 , totalRecordAfterDelete);
 	}
 }
 

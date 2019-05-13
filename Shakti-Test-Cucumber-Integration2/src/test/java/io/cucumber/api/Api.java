@@ -16,7 +16,7 @@ public class Api {
 	static String token = null;
 	static String connetionUrl;
 
-	public static void loadProperties() {
+	static {
 		Properties properties = FileUtil.loadProperties("configuration.properties");
 		setConnectionUrl(properties);
 	}
@@ -30,6 +30,7 @@ public class Api {
 	 */  
 	public static String postAPICallNew(String postApiUrl, String requestData) {
 		final String mainURLString  = connetionUrl+postApiUrl;
+		System.out.println("mainURLString :"+mainURLString);
 		RequestSpecification httpRequest = RestAssured.given();
 		httpRequest.header("Accept", "application/json");
 		httpRequest.header("Content-Type", "application/json; charset=UTF-8");
@@ -53,6 +54,7 @@ public class Api {
 	 */
 	public static String getAPICallNew(String getApiUrl) {
 		final String mainURLString = connetionUrl+getApiUrl;
+		System.out.println("mainURLString :"+mainURLString);
 		RequestSpecification httpRequest = RestAssured.given();
 		httpRequest.header("Authorization", "Bearer " +getToken());
 		Response response = httpRequest.get(mainURLString);
